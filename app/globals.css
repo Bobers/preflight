@@ -24,15 +24,40 @@
 } */
 
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, #FAFAFA 0%, #F5F2EE 100%);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  /* Subtle bowling pin background pattern */
+  /* More visible bowling pin background pattern */
   background-image: 
-    radial-gradient(circle at 20px 50px, rgba(139, 69, 19, 0.03) 2px, transparent 2px),
-    radial-gradient(circle at 80px 50px, rgba(139, 69, 19, 0.03) 2px, transparent 2px);
+    radial-gradient(circle at 20px 50px, rgba(139, 69, 19, 0.08) 3px, transparent 3px),
+    radial-gradient(circle at 80px 50px, rgba(139, 69, 19, 0.08) 3px, transparent 3px);
   background-size: 100px 100px;
   background-position: 0 0, 50px 50px;
+}
+
+/* Add custom bowling theme colors to Tailwind */
+.bg-bowling-brown {
+  background-color: var(--bowling-brown);
+}
+
+.bg-bowling-brown:hover {
+  background-color: #7a3e11;
+}
+
+.text-bowling-brown {
+  color: var(--bowling-brown);
+}
+
+.border-bowling-brown {
+  border-color: var(--bowling-brown);
+}
+
+.bg-carpet-orange {
+  background-color: var(--carpet-orange);
+}
+
+.text-carpet-orange {
+  color: var(--carpet-orange);
 }
 
 /* Bowling ball rolling animation */

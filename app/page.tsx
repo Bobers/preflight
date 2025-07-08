@@ -48,11 +48,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Main Content */}
       {!result ? (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <h1 className="text-4xl font-bold text-center mb-4 text-gray-900">
+          <h1 className="text-4xl font-bold text-center mb-4 text-bowling-brown">
             Dude, Where&apos;s the Money in Your Business Plan?
           </h1>
           <p className="text-lg text-center mb-8 text-gray-600 max-w-2xl mx-auto">
@@ -65,7 +65,7 @@ export default function Home() {
                 value={text}
                 onChange={handleTextChange}
                 placeholder="Paste your business plan here for the ultimate reality check... (minimum 100 characters)"
-                className="w-full h-96 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-900 bg-white placeholder-gray-500"
+                className="w-full h-96 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-bowling-brown text-gray-900 bg-white placeholder-gray-500"
                 disabled={isLoading}
               />
               
@@ -91,7 +91,7 @@ export default function Home() {
                 disabled={!isValidLength || isLoading}
                 className={`px-8 py-3 rounded-lg font-medium transition-colors ${
                   isValidLength && !isLoading
-                    ? 'bg-amber-700 hover:bg-amber-800 text-white'
+                    ? 'bg-bowling-brown hover:bg-bowling-brown text-white'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
@@ -133,7 +133,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {result.summary.total === 0 ? (
             <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-3xl font-bold mb-6 text-gray-900">
+              <h2 className="text-3xl font-bold mb-6 text-bowling-brown">
                 🎳 That&apos;s Like, a Really Solid Plan, Man
               </h2>
               <div className="bg-white rounded-lg shadow-md p-8 mb-8">
@@ -146,7 +146,7 @@ export default function Home() {
                 <div className="space-x-4">
                   <button
                     onClick={handleReset}
-                    className="px-6 py-3 bg-amber-700 hover:bg-amber-800 text-white rounded-lg font-medium transition-colors"
+                    className="px-6 py-3 bg-bowling-brown hover:bg-bowling-brown text-white rounded-lg font-medium transition-colors"
                   >
                     Try Another Plan
                   </button>
@@ -161,16 +161,16 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">
+              <h2 className="text-3xl font-bold text-center mb-8 text-bowling-brown">
                 Far Out! We Found {result.summary.total} Money Assumptions
               </h2>
           
           {/* Summary Dashboard */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h3 className="text-xl font-semibold mb-4">Summary</h3>
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8 border-l-4 border-bowling-brown">
+            <h3 className="text-xl font-semibold mb-4 text-bowling-brown">Summary</h3>
             <div className="grid grid-cols-4 gap-4 text-center">
               <div>
-                <p className="text-3xl font-bold">{result.summary.total}</p>
+                <p className="text-3xl font-bold text-bowling-brown">{result.summary.total}</p>
                 <p className="text-gray-600">Total Assumptions</p>
               </div>
               <div>
@@ -242,7 +242,7 @@ export default function Home() {
           <div className="mt-8 text-center space-y-4">
             <button
               onClick={handleReset}
-              className="px-8 py-3 bg-amber-700 hover:bg-amber-800 text-white rounded-lg font-medium transition-colors"
+              className="px-8 py-3 bg-bowling-brown hover:bg-bowling-brown text-white rounded-lg font-medium transition-colors"
             >
               Check Another Plan
             </button>
