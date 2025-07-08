@@ -3,6 +3,8 @@ import OpenAI from 'openai';
 import { Redis } from '@upstash/redis';
 import { z } from 'zod';
 import type { AnalysisResult } from '@/types';
+import { apiCircuitBreaker } from '@/utils/circuitBreaker';
+import { performanceMonitor } from '@/utils/performanceMonitor';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -55,12 +57,15 @@ function getClientIP(request: NextRequest): string {
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  
   try {
     // Check rate limit
     const clientIP = getClientIP(request);
     const withinLimit = await checkRateLimit(clientIP);
     
     if (!withinLimit) {
+      performanceMonitor.recordRequest(Date.now() - startTime, false);
       return NextResponse.json(
         { success: false, error: 'Too many requests. Please try again later.' },
         { 
@@ -123,18 +128,20 @@ Focus on identifying 5-10 key assumptions. If the text contains no identifiable 
     const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: text }
-        ],
-        response_format: { type: 'json_object' },
-        temperature: 0.3,
-        max_tokens: 2000,
-      }, {
-        signal: controller.signal as AbortSignal,
-      });
+      const completion = await apiCircuitBreaker.execute(async () => 
+        openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: text }
+          ],
+          response_format: { type: 'json_object' },
+          temperature: 0.3,
+          max_tokens: 2000,
+        }, {
+          signal: controller.signal as AbortSignal,
+        })
+      );
 
       clearTimeout(timeout);
 
@@ -176,6 +183,15 @@ Focus on identifying 5-10 key assumptions. If the text contains no identifiable 
         summary,
       };
 
+      // Record successful request
+      const duration = Date.now() - startTime;
+      performanceMonitor.recordRequest(duration, true);
+      
+      // Log metrics periodically
+      if (Math.random() < 0.1) { // 10% chance to log
+        performanceMonitor.logMetrics();
+      }
+
       return NextResponse.json({
         success: true,
         data: result,
@@ -196,6 +212,18 @@ Focus on identifying 5-10 key assumptions. If the text contains no identifiable 
 
   } catch (error) {
     console.error('API error:', error);
+    
+    // Record failed request
+    const duration = Date.now() - startTime;
+    performanceMonitor.recordRequest(duration, false);
+    
+    // Handle circuit breaker open state
+    if (error instanceof Error && error.message.includes('Circuit breaker is OPEN')) {
+      return NextResponse.json(
+        { success: false, error: 'Service temporarily unavailable due to high error rate. Please try again in a minute.' },
+        { status: 503 }
+      );
+    }
     
     // Handle specific OpenAI errors
     if (error && typeof error === 'object' && 'status' in error && error.status === 429) {
