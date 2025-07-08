@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAFAFA;
+  --foreground: #2F1B14;
+  --bowling-brown: #8B4513;
+  --carpet-orange: #FF8C00;
+  --white-russian: #F5F5DC;
 }
 
 @theme inline {
@@ -24,4 +27,52 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  /* Subtle bowling pin background pattern */
+  background-image: 
+    radial-gradient(circle at 20px 50px, rgba(139, 69, 19, 0.03) 2px, transparent 2px),
+    radial-gradient(circle at 80px 50px, rgba(139, 69, 19, 0.03) 2px, transparent 2px);
+  background-size: 100px 100px;
+  background-position: 0 0, 50px 50px;
+}
+
+/* Bowling ball rolling animation */
+@keyframes bowlingRoll {
+  0% {
+    transform: translateX(-100px) rotate(0deg);
+  }
+  100% {
+    transform: translateX(calc(100vw + 100px)) rotate(720deg);
+  }
+}
+
+.bowling-ball {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(45deg, #2F1B14 0%, #1a0f0a 50%, #2F1B14 100%);
+  border-radius: 50%;
+  position: relative;
+  animation: bowlingRoll 3s linear infinite;
+}
+
+.bowling-ball::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+.bowling-ball::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 6px;
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  box-shadow: 4px 0 0 rgba(255, 255, 255, 0.3);
 }

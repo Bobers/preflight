@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     if (!withinLimit) {
       performanceMonitor.recordRequest(Date.now() - startTime, false);
       return NextResponse.json(
-        { success: false, error: 'Too many requests. Please try again later.' },
+        { success: false, error: 'Whoa, slow down there, dude. Too many requests. Take a breather and try again later.' },
         { 
           status: 429,
           headers: {
@@ -105,23 +105,40 @@ export async function POST(request: NextRequest) {
     }
 
     // Create prompt for OpenAI
-    const systemPrompt = `You are an expert business analyst who identifies hidden assumptions in business plans. Your task is to:
+    const systemPrompt = `You are a ruthless business analyst asking "WHERE'S THE MONEY?" for every claim. 
 
-1. Read the business plan text carefully
-2. Identify statements that contain assumptions (claims without evidence, projections, market beliefs)
-3. Extract the EXACT quote from the text (verbatim, character-for-character)
-4. Classify each assumption's risk level:
-   - critical: Fundamental assumptions that could invalidate the entire business
-   - important: Significant assumptions that affect major aspects
-   - minor: Small assumptions with limited impact
-5. Provide brief reasoning (max 20 words) explaining the risk
+Your job: Find statements that make assumptions about MONEY FLOW without evidence.
 
-Return a JSON object with an "assumptions" array. Each assumption should have:
-- text: The exact quote from the input (must be a substring that exists in the original text)
-- risk_level: "critical", "important", or "minor"
-- reasoning: Brief explanation (max 20 words)
+Focus on these critical money assumptions:
+- WHO will pay (customer assumptions)
+- HOW MUCH they'll pay (pricing assumptions) 
+- WHEN they'll pay (timeline assumptions)
+- HOW MANY will pay (market size assumptions)
+- WHAT it costs to deliver (operational assumptions)
+- HOW LONG money lasts (burn rate assumptions)
 
-Focus on identifying 5-10 key assumptions. If the text contains no identifiable assumptions or is nonsensical, return an empty assumptions array.`;
+For each assumption found:
+1. Extract EXACT quote (verbatim, character-for-character)
+2. Classify risk:
+   - critical: Could kill the business if wrong
+   - important: Significantly impacts profitability  
+   - minor: Small financial impact
+3. Explain the money risk in max 20 words
+
+Return JSON:
+{
+  "assumptions": [
+    {
+      "text": "exact quote from input",
+      "risk_level": "critical|important|minor", 
+      "reasoning": "why this money assumption is risky"
+    }
+  ]
+}
+
+Focus on 5-10 key MONEY assumptions. Ignore non-financial assumptions. If no money assumptions found, return empty array.
+
+Remember: Every assumption should answer "Where's the money?" or "Where's the money going?"`;
 
     // Call OpenAI API with timeout
     const controller = new AbortController();
@@ -202,7 +219,7 @@ Focus on identifying 5-10 key assumptions. If the text contains no identifiable 
       
       if (error instanceof Error && error.name === 'AbortError') {
         return NextResponse.json(
-          { success: false, error: 'Analysis took too long. Please try again.' },
+          { success: false, error: 'That took way too long, man. Analysis timed out. Try again with maybe a shorter plan?' },
           { status: 504 }
         );
       }
@@ -220,7 +237,7 @@ Focus on identifying 5-10 key assumptions. If the text contains no identifiable 
     // Handle circuit breaker open state
     if (error instanceof Error && error.message.includes('Circuit breaker is OPEN')) {
       return NextResponse.json(
-        { success: false, error: 'Service temporarily unavailable due to high error rate. Please try again in a minute.' },
+        { success: false, error: 'The lane\'s closed, dude. Service temporarily unavailable. Please try again in a minute.' },
         { status: 503 }
       );
     }
@@ -228,13 +245,13 @@ Focus on identifying 5-10 key assumptions. If the text contains no identifiable 
     // Handle specific OpenAI errors
     if (error && typeof error === 'object' && 'status' in error && error.status === 429) {
       return NextResponse.json(
-        { success: false, error: 'AI service is currently busy. Please try again in a moment.' },
+        { success: false, error: 'The AI is taking a coffee break, man. Please try again in a moment.' },
         { status: 503 }
       );
     }
     
     return NextResponse.json(
-      { success: false, error: 'An error occurred during analysis. Please try again.' },
+      { success: false, error: 'Something went wrong with the analysis, dude. Sometimes shit happens. Please try again.' },
       { status: 500 }
     );
   }
