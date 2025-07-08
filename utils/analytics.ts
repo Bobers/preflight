@@ -1,8 +1,12 @@
 import { track } from '@vercel/analytics';
 
-export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
+type AnalyticsProperties = {
+  [key: string]: string | number | boolean | null;
+};
+
+export const trackEvent = (eventName: string, properties?: AnalyticsProperties) => {
   try {
-    track(eventName, properties as any);
+    track(eventName, properties);
   } catch (error) {
     console.error('Analytics tracking error:', error);
   }
