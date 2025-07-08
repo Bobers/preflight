@@ -31,14 +31,14 @@ export default function Home() {
     setShowFullScreenLoading(true);
     analyticsEvents.analysisStarted();
     
-    // Ensure minimum 7 seconds of loading screen
+    // Ensure minimum 3 seconds of loading screen
     const startTime = Date.now();
     
     try {
       await analyze(text);
     } finally {
       const elapsed = Date.now() - startTime;
-      const remainingTime = Math.max(0, 7000 - elapsed);
+      const remainingTime = Math.max(0, 3000 - elapsed);
       
       setTimeout(() => {
         setShowFullScreenLoading(false);
