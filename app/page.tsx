@@ -62,7 +62,7 @@ export default function Home() {
                 value={text}
                 onChange={handleTextChange}
                 placeholder="Paste your business plan, pitch deck content, or startup idea here... (minimum 100 characters)"
-                className="w-full h-96 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-96 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white placeholder-gray-500"
                 disabled={isLoading}
               />
               
