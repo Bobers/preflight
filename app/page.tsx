@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { sampleBusinessPlan } from '@/utils/sampleContent';
 import { useAnalysis } from '@/utils/hooks';
 import { analyticsEvents } from '@/utils/analytics';
@@ -9,8 +8,7 @@ import { analyticsEvents } from '@/utils/analytics';
 export default function Home() {
   const [text, setText] = useState('');
   const [feedbackGiven, setFeedbackGiven] = useState(false);
-  const [showFullScreenLoading, setShowFullScreenLoading] = useState(false);
-  const { analyze, reset, error, result } = useAnalysis();
+  const { analyze, reset, isLoading, error, result } = useAnalysis();
 
   const characterCount = text.length;
   const isValidLength = characterCount >= 100 && characterCount <= 10000;
@@ -28,28 +26,13 @@ export default function Home() {
   };
 
   const handleAnalyze = async () => {
-    setShowFullScreenLoading(true);
     analyticsEvents.analysisStarted();
-    
-    // Ensure minimum 7 seconds of loading screen
-    const startTime = Date.now();
-    
-    try {
-      await analyze(text);
-    } finally {
-      const elapsed = Date.now() - startTime;
-      const remainingTime = Math.max(0, 7000 - elapsed);
-      
-      setTimeout(() => {
-        setShowFullScreenLoading(false);
-      }, remainingTime);
-    }
+    await analyze(text);
   };
 
   const handleReset = () => {
     setText('');
     setFeedbackGiven(false);
-    setShowFullScreenLoading(false);
     reset();
   };
   
@@ -66,22 +49,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Full Screen Loading Overlay */}
-      {showFullScreenLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
-          <div className="text-center">
-            <Image 
-              src="/loading.gif" 
-              alt="Loading analysis..." 
-              width={800}
-              height={600}
-              className="max-w-full max-h-screen object-contain"
-              unoptimized={true}
-            />
-          </div>
-        </div>
-      )}
-      
       {/* Main Content */}
       {!result ? (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -99,7 +66,7 @@ export default function Home() {
                 onChange={handleTextChange}
                 placeholder="Paste your business plan here for the ultimate reality check... (minimum 100 characters)"
                 className="w-full h-96 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-bowling-brown text-gray-900 bg-white placeholder-gray-500"
-                disabled={showFullScreenLoading}
+                disabled={isLoading}
               />
               
               <div className="mt-2 flex justify-between items-center">
@@ -111,7 +78,7 @@ export default function Home() {
                 <button
                   onClick={loadSampleContent}
                   className="text-sm text-blue-600 hover:text-blue-800 underline"
-                  disabled={showFullScreenLoading}
+                  disabled={isLoading}
                 >
                   Try with sample plan
                 </button>
@@ -121,21 +88,36 @@ export default function Home() {
             <div className="flex justify-center">
               <button
                 onClick={handleAnalyze}
-                disabled={!isValidLength || showFullScreenLoading}
+                disabled={!isValidLength || isLoading}
                 className={`px-8 py-3 rounded-lg font-medium transition-colors ${
-                  isValidLength && !showFullScreenLoading
+                  isValidLength && !isLoading
                     ? 'bg-bowling-brown hover:bg-bowling-brown text-white'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
-                {showFullScreenLoading ? (
-                  'Analyzing...'
+                {isLoading ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Analyzing...
+                  </span>
                 ) : (
                   'Find the Money, Dude'
                 )}
               </button>
             </div>
             
+            {isLoading && (
+              <div className="mt-4 text-center text-gray-600">
+                <div className="flex justify-center mb-3 overflow-hidden">
+                  <div className="bowling-ball"></div>
+                </div>
+                <p>Hold on, we&apos;re taking a closer look at this...</p>
+                <p className="text-sm">This usually takes about 15 seconds, so grab a White Russian</p>
+              </div>
+            )}
             
             {error && (
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
