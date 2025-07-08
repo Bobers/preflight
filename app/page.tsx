@@ -315,6 +315,8 @@ export default function Home() {
           🎳 This Website Really Ties the Room Together
         </h3>
         <div className="space-x-4 mb-4">
+          <a href="/about" className="hover:underline">About</a>
+          <span>|</span>
           <a href="/privacy" className="hover:underline">Privacy Policy</a>
           <span>|</span>
           <a href="/terms" className="hover:underline">Terms</a>
